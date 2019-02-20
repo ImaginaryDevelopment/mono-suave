@@ -27,7 +27,7 @@ let prettifySize (i:int64) =
         |Some(rem,o) -> sprintf "%i%s" rem o
 
 let rec search basePath =
-    printfn "Starting in search %s" basePath
+    //printfn "Starting in search %s" basePath
     seq{
         yield! Directory.EnumerateFiles(basePath,"*.zip")
         yield! (
@@ -124,7 +124,7 @@ let appveyorRest() =
         5
 
 [<EntryPoint>]
-let main argv = 
+let main argv =
     printfn "----------------------"
     printfn "----------------------"
     printfn "MonoSuave.Deploy running"
