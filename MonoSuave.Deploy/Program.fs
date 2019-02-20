@@ -65,6 +65,7 @@ let appveyorRest() =
             |Some x -> Some x
             | None -> zipItManually()
         |> Option.map(fun zp ->
+            printfn "Starting upload"
             async{
                 let bytes = File.ReadAllBytes(zp)
                 use form = new MultipartFormDataContent()
@@ -78,9 +79,16 @@ let appveyorRest() =
                     |> Convert.ToBase64String
                 wc.DefaultRequestHeaders.Authorization <- System.Net.Http.Headers.AuthenticationHeaderValue("Basic", encodeAuth u p)
                 let! r = Async.AwaitTask <| wc.PostAsync("https://imaginarysuave.scm.azurewebsites.net/api/zipdeploy",form)
-                return if r.IsSuccessStatusCode then 0 else 1
+                printfn "Upload finished?"
+                if r.IsSuccessStatusCode then
+                    printfn "Upload completed"
+                    return 0
+                else return 1
             }
             |> Async.RunSynchronously
+            |> fun result ->
+                printfn "Async finished"
+                result
         )
         |> Option.defaultValue 2
     | NonValueString, NonValueString ->
@@ -98,6 +106,7 @@ let main argv =
     printfn "MonoSuave.Deploy running"
     printfn "%A" argv
     appveyorRest()
-    |> ignore
+    |> fun result ->
+        printfn "Rest returned %i" result
     0
     //0 // return an integer exit code
