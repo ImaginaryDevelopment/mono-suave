@@ -24,3 +24,13 @@ after_build:
 
 artifacts:
  - path: MonoSuave/MonoSuave/bin/$(configuration)
+
+deploy:
+  # Deploy to GitHub Releases
+  - provider: GitHub
+    artifact: /.*\.zip/           # upload zip file
+    draft: false
+    prerelease: true
+    on:
+      branch: master                # release from master branch only
+      APPVEYOR_REPO_TAG: false      # deploy on tag push only
