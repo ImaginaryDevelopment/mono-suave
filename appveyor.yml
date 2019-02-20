@@ -23,7 +23,10 @@ after_build:
  - echo checking ls
  - ls MonoSuave.Deploy/bin
  - echo attempting exe call
- - "./MonoSuave.Deploy/bin/Release/MonoSuave.Deploy.exe"
+ - cd MonoSuave.Deploy
+ - cd bin
+ - cd Release
+ - MonoSuave.Deploy.exe
 
 artifacts:
  - path: MonoSuave/bin/$(configuration)
