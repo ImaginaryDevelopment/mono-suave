@@ -22,7 +22,7 @@ let prettifySize (i:int64) =
     |> Seq.tryLast
     |> function
         |None -> sprintf "%A%s" i sizes.[0]
-        |Some(rem,o) -> sprintf "%A%s" rem sizes.[o]
+        |Some(rem,o) -> sprintf "%A%s" rem o
 
 let rec search basePath =
     printfn "Starting in search %s" basePath
