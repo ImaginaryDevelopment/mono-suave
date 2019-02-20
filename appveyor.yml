@@ -15,7 +15,7 @@ assembly_info:
 
 after_build:
  - cd
- - ls MonoSuave/MonoSuave
+ - ls MonoSuave/MonoSuave/bin
 
 artifacts:
- - path: MonoSuave/MonoSuave/bin/$configuration/
+ - path: MonoSuave/MonoSuave/bin/$(configuration)
