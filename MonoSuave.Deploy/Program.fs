@@ -81,7 +81,11 @@ let appveyorRest() =
                 let! r = Async.AwaitTask <| wc.PostAsync("https://imaginarysuave.scm.azurewebsites.net/api/zipdeploy",form)
                 printfn "Upload finished?"
                 if r.IsSuccessStatusCode then
-                    printfn "Upload completed"
+                    printfn "Upload completed with %A" r.StatusCode
+                    let! x = Async.AwaitTask <| r.Content.ReadAsStringAsync()
+                    printfn "----------------------"
+                    printfn "Response:%s" x
+                    printfn "----------------------"
                     return 0
                 else return 1
             }
@@ -103,10 +107,14 @@ let appveyorRest() =
 
 [<EntryPoint>]
 let main argv = 
+    printfn "----------------------"
+    printfn "----------------------"
     printfn "MonoSuave.Deploy running"
-    printfn "%A" argv
+    printfn "args:%A" argv
     appveyorRest()
     |> fun result ->
         printfn "Rest returned %i" result
+        printfn "----------------------"
+        printfn "----------------------"
     0
     //0 // return an integer exit code
