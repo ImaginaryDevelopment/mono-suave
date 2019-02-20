@@ -1,0 +1,5 @@
+NUGET
+  remote: https://www.nuget.org/api/v2
+    FSharp.Core (4.6.2) - restriction: || (>= net461) (>= netstandard2.0)
+    Suave (2.5.3)
+      FSharp.Core (>= 4.0 < 5.0) - restriction: || (>= net461) (>= netstandard2.0)

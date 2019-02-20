@@ -1,0 +1,1 @@
+"%~dp0/.paket/paket.exe" %*
