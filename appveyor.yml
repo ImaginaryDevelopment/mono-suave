@@ -47,5 +47,5 @@ deploy:
     folder: site/wwwroot
     application:
     active_mode: false
-    beta: true      # enable alternative FTP library for 'ftp' and 'ftps' modes
+    beta: false # enable alternative FTP library for 'ftp' and 'ftps' modes
     debug: true     # show complete FTP log
