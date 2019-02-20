@@ -20,8 +20,10 @@ after_build:
  - cd
  - set
  - echo $configuration
+ - echo checking ls
  - ls MonoSuave.Deploy/bin
- - MonoSuave.Deploy/bin/MonoSuave.Deploy.exe
+ - echo attempting exe call
+ - MonoSuave.Deploy/bin/Release/MonoSuave.Deploy.exe
 
 artifacts:
  - path: MonoSuave/bin/$(configuration)
