@@ -3,6 +3,8 @@ image: Visual Studio 2017
 install:
  - ls
  - paket.bat restore
+before_build:
+  - echo Going to build
 
 # enable patching of AssemblyInfo.* files
 assembly_info:

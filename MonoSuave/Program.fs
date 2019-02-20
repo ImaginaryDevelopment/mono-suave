@@ -2,6 +2,7 @@
 open Suave.Filters
 open Suave.Operators
 open Suave.Successful
+open System.Net
 
 
 // Learn more about F# at http://fsharp.org
@@ -32,6 +33,9 @@ let routing =
 let main argv =
     printfn "%A" argv
     printfn "Starting up server"
-    startWebServer defaultConfig routing
+    let add = HttpBinding.create HTTP (IPAddress.Parse "0.0.0.0") (Sockets.Port.Parse("80"))
+
+    let config = {defaultConfig with bindings=add::defaultConfig.bindings}
+    startWebServer config routing
     eprintfn "Server finished?"
     0 // return an integer exit code
