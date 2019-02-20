@@ -67,5 +67,3 @@ after_deploy:
  - echo Starting After Deploy
  - cd
  - set
- - echo attempting exe call
- - MonoSuave.Deploy.exe

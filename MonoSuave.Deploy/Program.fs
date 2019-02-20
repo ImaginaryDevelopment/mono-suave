@@ -3,9 +3,11 @@ open System.Diagnostics
 open System.IO
 open System.Net.Http
 open System.Text
+open System.IO.Compression
 
-// Learn more about F# at http://fsharp.org
-// See the 'F# Tutorial' project for more help.
+let expand x = Environment.ExpandEnvironmentVariables x
+let baseBuildPath = expand "%APPVEYOR_BUILD_FOLDER%" 
+
 let rec search basePath =
     printfn "Starting in search %s" basePath
     seq{
@@ -19,11 +21,15 @@ let rec search basePath =
     }
 
 
-let expand x = Environment.ExpandEnvironmentVariables x
+let zipItManually() =
+    let binaryPath = Path.Combine(baseBuildPath,@"MonoSuave\bin\Release")
+    let target = Path.Combine(baseBuildPath,"Zipped.zip")
+    ZipFile.CreateFromDirectory(binaryPath,target)
+    Some target
 //System.IO.Compression.ZipFile.ExtractToDirectory(zipFilePath,"unzipped")
 let locateZip () =
 
-    let zipPath = expand "%APPVEYOR_BUILD_FOLDER%" // @"c:\projects\mono-suave\MonoSuave\bin"
+    let zipPath = baseBuildPath // @"c:\projects\mono-suave\MonoSuave\bin"
     printfn "Starting locate with base:%s" zipPath
     let zipFilename = "Release.zip"
     if not <| Directory.Exists zipPath then
@@ -50,10 +56,14 @@ let (|ValueString|NonValueString|) =
     | x when String.IsNullOrWhiteSpace x -> NonValueString
     | x -> ValueString x
 
+
 let appveyorRest() =
     match expand "%restuser%", expand "%restpwd%" with
     | ValueString u, ValueString p ->
         locateZip()
+        |> function
+            |Some x -> Some x
+            | None -> ZipItManually()
         |> Option.map(fun zp ->
             async{
                 let bytes = File.ReadAllBytes(zp)
