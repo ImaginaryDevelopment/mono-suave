@@ -50,6 +50,7 @@
     <None Include="App.config" />
     <Content Include="packages.config" />
     <None Include="paket.dependencies" />
+    <Content Include="web.config" />
   </ItemGroup>
   <ItemGroup>
     <Reference Include="FSharp.Core">
