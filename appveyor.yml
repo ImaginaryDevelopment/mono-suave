@@ -29,12 +29,13 @@ deploy:
   # Deploy to GitHub Releases
   - provider: GitHub
     artifact: /.*\.zip/           # upload zip file
-    draft: false
+    draft: true
     prerelease: true
     auth_token:
       secure: MXWyxCowyu8qHT2YssKyplS9byArM3dNycCEq8t6HJPcWY75sOahFIOIwOE7FIQd
     on:
       branch: master                # release from master branch only
+      APPVEYOR_REPO_TAG: true       # deploy on tag push only
 
   - provider: FTP
     protocol: ftp|ftps|sftp

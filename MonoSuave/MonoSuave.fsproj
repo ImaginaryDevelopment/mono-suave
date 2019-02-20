@@ -50,7 +50,9 @@
     <None Include="App.config" />
     <Content Include="packages.config" />
     <None Include="paket.dependencies" />
-    <Content Include="web.config" />
+    <Content Include="web.config">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
   </ItemGroup>
   <ItemGroup>
     <Reference Include="FSharp.Core">
