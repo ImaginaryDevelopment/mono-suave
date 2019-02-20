@@ -5,6 +5,8 @@ VisualStudioVersion = 15.0.28307.136
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{F2A71F9B-5D33-465A-A702-920D77279786}") = "MonoSuave", "MonoSuave\MonoSuave.fsproj", "{3322C784-8586-49BB-8E06-6BA996B7963C}"
 EndProject
+Project("{F2A71F9B-5D33-465A-A702-920D77279786}") = "MonoSuave.Deploy", "MonoSuave.Deploy\MonoSuave.Deploy.fsproj", "{CE244D48-2076-44DD-8D9A-C4D6784A31D9}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -15,6 +17,10 @@ Global
 		{3322C784-8586-49BB-8E06-6BA996B7963C}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{3322C784-8586-49BB-8E06-6BA996B7963C}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{3322C784-8586-49BB-8E06-6BA996B7963C}.Release|Any CPU.Build.0 = Release|Any CPU
+		{CE244D48-2076-44DD-8D9A-C4D6784A31D9}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{CE244D48-2076-44DD-8D9A-C4D6784A31D9}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{CE244D48-2076-44DD-8D9A-C4D6784A31D9}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{CE244D48-2076-44DD-8D9A-C4D6784A31D9}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

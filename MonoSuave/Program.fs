@@ -14,4 +14,5 @@ let routing =
 [<EntryPoint>]
 let main argv =
     printfn "%A" argv
+    startWebServer defaultConfig routing
     0 // return an integer exit code
