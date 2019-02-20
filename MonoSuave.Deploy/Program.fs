@@ -7,6 +7,7 @@ open System.Text
 // Learn more about F# at http://fsharp.org
 // See the 'F# Tutorial' project for more help.
 let rec search basePath =
+    printfn "Starting search"
     seq{
         yield! Directory.EnumerateFiles(basePath,"*.zip")
         yield! (
@@ -18,9 +19,12 @@ let rec search basePath =
     }
 
 
+let expand x = Environment.ExpandEnvironmentVariables x
 //System.IO.Compression.ZipFile.ExtractToDirectory(zipFilePath,"unzipped")
 let locateZip () =
-    let zipPath = @"c:\projects\mono-suave\MonoSuave\bin"
+
+    let zipPath = expand "%APPVEYOR_BUILD_FOLDER%" // @"c:\projects\mono-suave\MonoSuave\bin"
+    printfn "Starting locate with base:%s" zipPath
     let zipFilename = "Release.zip"
     if not <| Directory.Exists zipPath then
         let fullPath = Path.GetFullPath zipPath
@@ -47,7 +51,6 @@ let (|ValueString|NonValueString|) =
     | x -> ValueString x
 
 let appveyorRest() =
-    let expand x = Environment.ExpandEnvironmentVariables x
     match expand "%restuser%", expand "%restpwd%" with
     | ValueString u, ValueString p ->
         locateZip()
