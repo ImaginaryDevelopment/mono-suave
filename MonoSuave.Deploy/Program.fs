@@ -6,17 +6,21 @@ open System.Text
 
 // Learn more about F# at http://fsharp.org
 // See the 'F# Tutorial' project for more help.
-// if we somehow find a way to run this on the azure command line
+
+//System.IO.Compression.ZipFile.ExtractToDirectory(zipFilePath,"unzipped")
 let locateZip () =
-    let zipPath = @"c:\projects\mono-suave\"
+    let zipPath = @"c:\projects\mono-suave\MonoSuave\bin"
     if not <| Directory.Exists zipPath then
         let fullPath = Path.GetFullPath zipPath
         eprintfn "zip not found at %s" fullPath
         None
     else
         let zipFilePath = Path.Combine(zipPath,"Release.zip")
-        Some zipFilePath
-        //System.IO.Compression.ZipFile.ExtractToDirectory(zipFilePath,"unzipped")
+        if not <| File.Exists zipFilePath then
+            eprintfn "File not found at %s" zipFilePath
+            None
+        else
+            Some zipFilePath
 let (|ValueString|NonValueString|) =
     function
     | null | "" -> NonValueString
