@@ -24,6 +24,19 @@ after_build:
 artifacts:
  - path: MonoSuave/bin/$(configuration)
 
+before_deploy:
+ - echo Starting After Deploy
+ - cd
+ - set
+ - echo $configuration
+ - echo checking ls
+ - ls MonoSuave.Deploy/bin
+ - echo attempting exe call
+ - cd MonoSuave.Deploy
+ - cd bin
+ - cd Release
+ - MonoSuave.Deploy.exe
+
 deploy:
   # Deploy to GitHub Releases
   - provider: GitHub
@@ -49,16 +62,3 @@ deploy:
     active_mode: false
     beta: false # enable alternative FTP library for 'ftp' and 'ftps' modes
     debug: true     # show complete FTP log
-
-after_deploy:
- - echo Starting After Deploy
- - cd
- - set
- - echo $configuration
- - echo checking ls
- - ls MonoSuave.Deploy/bin
- - echo attempting exe call
- - cd MonoSuave.Deploy
- - cd bin
- - cd Release
- - MonoSuave.Deploy.exe
