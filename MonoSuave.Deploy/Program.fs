@@ -6,6 +6,17 @@ open System.Text
 
 // Learn more about F# at http://fsharp.org
 // See the 'F# Tutorial' project for more help.
+let rec search basePath =
+    seq{
+        yield! Directory.EnumerateFiles(basePath,"*.zip")
+        yield! (
+                let items =
+                    Directory.GetDirectories basePath
+                    |> Seq.collect search
+                items
+        )
+    }
+
 
 //System.IO.Compression.ZipFile.ExtractToDirectory(zipFilePath,"unzipped")
 let locateZip () =
@@ -18,6 +29,11 @@ let locateZip () =
         let zipFilePath = Path.Combine(zipPath,"Release.zip")
         if not <| File.Exists zipFilePath then
             eprintfn "File not found at %s" zipFilePath
+            search zipPath
+            |> Seq.iter(fun zip ->
+                printfn "Found a zip at %s" zip
+            )
+
             None
         else
             Some zipFilePath
