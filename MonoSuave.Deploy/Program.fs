@@ -15,14 +15,16 @@ let prettifySize (i:int64) =
             let result =(l,sizes.[0])
             Some(result,(0L,sizes.Length))
         elif l >= 1024L && order < sizes.Length then
-            let result =(l,sizes.[order])
-            Some (result,(i/1024L,order + 1))
+            let value = l/1024L
+            let o = order + 1
+            let result =(value,sizes.[o])
+            Some (result,(value,o))
         else None
     )
     |> Seq.tryLast
     |> function
-        |None -> sprintf "%A%s" i sizes.[0]
-        |Some(rem,o) -> sprintf "%A%s" rem o
+        |None -> sprintf "%i%s" i sizes.[0]
+        |Some(rem,o) -> sprintf "%i%s" rem o
 
 let rec search basePath =
     printfn "Starting in search %s" basePath
@@ -43,7 +45,7 @@ let zipItManually() =
     ZipFile.CreateFromDirectory(binaryPath,target)
     FileInfo(target).Length
     |> prettifySize
-    |> printfn "Created zip with size %A" 
+    |> printfn "Created zip with size %s" 
 
     Some target
 let locateZip () =

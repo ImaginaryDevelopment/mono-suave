@@ -18,7 +18,7 @@ configuration: Release
 
 after_build:
  - cd
- - set
+#  - set
  - echo $configuration
 
 artifacts:
