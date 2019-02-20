@@ -26,11 +26,10 @@ let zipItManually() =
     let target = Path.Combine(baseBuildPath,"Zipped.zip")
     ZipFile.CreateFromDirectory(binaryPath,target)
     Some target
-//System.IO.Compression.ZipFile.ExtractToDirectory(zipFilePath,"unzipped")
 let locateZip () =
 
     let zipPath = baseBuildPath // @"c:\projects\mono-suave\MonoSuave\bin"
-    printfn "Starting locate with base:%s" zipPath
+    //printfn "Starting locate with base:%s" zipPath
     let zipFilename = "Release.zip"
     if not <| Directory.Exists zipPath then
         let fullPath = Path.GetFullPath zipPath
@@ -79,9 +78,8 @@ let appveyorRest() =
                     |> Convert.ToBase64String
                 wc.DefaultRequestHeaders.Authorization <- System.Net.Http.Headers.AuthenticationHeaderValue("Basic", encodeAuth u p)
                 let! r = Async.AwaitTask <| wc.PostAsync("https://imaginarysuave.scm.azurewebsites.net/api/zipdeploy",form)
-                printfn "Upload finished?"
+                printfn "Upload completed with %A:%s" r.StatusCode r.ReasonPhrase
                 if r.IsSuccessStatusCode then
-                    printfn "Upload completed with %A" r.StatusCode
                     let! x = Async.AwaitTask <| r.Content.ReadAsStringAsync()
                     printfn "----------------------"
                     printfn "Response:%s" x
