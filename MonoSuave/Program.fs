@@ -4,7 +4,14 @@ open Suave.Operators
 open Suave.Successful
 open System.Net
 
-
+let (|ParseInt|_|)=
+    function
+    | null | "" -> None
+    | x ->
+        match System.Int32.TryParse x with
+        | true, x -> Some x
+        | _ -> None
+        
 // Learn more about F# at http://fsharp.org
 // See the 'F# Tutorial' project for more help.
 let broadcast msg =
@@ -31,9 +38,14 @@ let routing =
     ]
 [<EntryPoint>]
 let main argv =
-    printfn "%A" argv
+    printfn "args:%A" argv
+    let port =
+        match argv |> List.ofArray with
+        | ParseInt port :: _ -> uint16 port
+        | _ -> HttpBinding.defaults.socketBinding.port
+        //| _ -> 8080us
+
     printfn "Starting up server"
-    let port = HttpBinding.defaults.socketBinding.port
     printfn "Binding also to port %A" port
     let add = HttpBinding.create HTTP (IPAddress.Parse "0.0.0.0") port
 
