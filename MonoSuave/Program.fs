@@ -33,9 +33,8 @@ let routing =
 let main argv =
     printfn "%A" argv
     printfn "Starting up server"
-    let add = HttpBinding.create HTTP (IPAddress.Parse "0.0.0.0") (Sockets.Port.Parse("80"))
 
-    let config = {defaultConfig with bindings=add::defaultConfig.bindings}
+    let config = defaultConfig
     startWebServer config routing
     eprintfn "Server finished?"
     0 // return an integer exit code
