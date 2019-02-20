@@ -17,4 +17,4 @@ after_build:
  - ls
 
 artifacts:
- -path: bin
+ - path: bin
