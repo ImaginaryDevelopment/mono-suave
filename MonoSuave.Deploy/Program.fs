@@ -8,7 +8,7 @@ open System.Text
 // See the 'F# Tutorial' project for more help.
 // if we somehow find a way to run this on the azure command line
 let locateZip () =
-    let zipPath = "MonoSuave\bin\Release"
+    let zipPath = @"c:\projects\mono-suave\"
     if not <| Directory.Exists zipPath then
         let fullPath = Path.GetFullPath zipPath
         eprintfn "zip not found at %s" fullPath
