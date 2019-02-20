@@ -39,12 +39,12 @@ deploy:
   - provider: FTP
     protocol: ftps
     host:
-      secure: Zq6zUVt7fzsNVFgg/F+AmzthFqT8DMJTa/Fv3uMiEqw3o6awxve1Iidv3yeaaGcWT/eJhx8OhyZE17NiKsAYSQ==
+      secure: Zq6zUVt7fzsNVFgg/F+AmzthFqT8DMJTa/Fv3uMiEqxTQEQtHwD801BSRwEj3z0O
     username:
       secure: L3OSr4Y1cFOo0i6gw36/7OkP4pC/YvUqpk28InRESBs=
     password:
       secure: Vi/leN/rU3468ULzmqHSJUIPgS0s+tL0kfI/26uMRhE7gnGNMvgVZDaanYofG5g+jRUhvdFKZ4v6C33P2IKlLw==
-    # folder: site/wwwroot
+    folder: site/wwwroot
     application:
     active_mode: false
     beta: true      # enable alternative FTP library for 'ftp' and 'ftps' modes
