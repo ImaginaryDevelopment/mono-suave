@@ -39,17 +39,21 @@ let routing =
 [<EntryPoint>]
 let main argv =
     printfn "args:%A" argv
-    let port =
-        match argv |> List.ofArray with
-        | ParseInt port :: _ -> uint16 port
-        | _ -> HttpBinding.defaults.socketBinding.port
-        //| _ -> 8080us
+    match argv |> List.ofArray with
+    | ParseInt port :: _ -> uint16 port |> Choice1Of2
+    | "update" :: filename :: runPath :: [] ->  Choice2Of2 (filename,runPath)
+    | "update" :: _ -> failwithf "bad update args"
+    | _ -> HttpBinding.defaults.socketBinding.port |> Choice1Of2
+    //| _ -> 8080us
+    |> function
+        |Choice2Of2 (filename,runPath) -> Updater.updateMe filename runPath
+        | Choice1Of2 port ->
+            printfn "Starting up server"
+            printfn "Binding also to port %A" port
+            let add = HttpBinding.create HTTP (IPAddress.Parse "0.0.0.0") port
 
-    printfn "Starting up server"
-    printfn "Binding also to port %A" port
-    let add = HttpBinding.create HTTP (IPAddress.Parse "0.0.0.0") port
-
-    let config = {defaultConfig with bindings=add::defaultConfig.bindings}
-    startWebServer config routing
-    eprintfn "Server finished?"
+            let config = {defaultConfig with bindings=add::defaultConfig.bindings}
+            let t = Updater.launchWatcher()
+            startWebServer config routing
+            eprintfn "Server finished?"
     0 // return an integer exit code
