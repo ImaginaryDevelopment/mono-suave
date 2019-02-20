@@ -21,20 +21,23 @@ let rec search basePath =
 //System.IO.Compression.ZipFile.ExtractToDirectory(zipFilePath,"unzipped")
 let locateZip () =
     let zipPath = @"c:\projects\mono-suave\MonoSuave\bin"
+    let zipFilename = "Release.zip"
     if not <| Directory.Exists zipPath then
         let fullPath = Path.GetFullPath zipPath
+        // maybe eprintfn doesn't show up
+        printfn "zip not found at %s" fullPath
         eprintfn "zip not found at %s" fullPath
         None
     else
-        let zipFilePath = Path.Combine(zipPath,"Release.zip")
+        let zipFilePath = Path.Combine(zipPath,zipFilename)
         if not <| File.Exists zipFilePath then
+            printfn "File not found at %s" zipFilePath
             eprintfn "File not found at %s" zipFilePath
             search zipPath
-            |> Seq.iter(fun zip ->
+            |> Seq.tryFind(fun zip ->
                 printfn "Found a zip at %s" zip
+                Path.GetFileName zip = zipFilename
             )
-
-            None
         else
             Some zipFilePath
 let (|ValueString|NonValueString|) =
