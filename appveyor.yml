@@ -25,7 +25,7 @@ artifacts:
  - path: MonoSuave/bin/$(configuration)
 
 before_deploy:
- - echo Starting After Deploy
+ - echo Starting Before Deploy
  - cd
  - set
  - echo $configuration
@@ -62,3 +62,10 @@ deploy:
     active_mode: false
     beta: false # enable alternative FTP library for 'ftp' and 'ftps' modes
     debug: true     # show complete FTP log
+
+after_deploy:
+ - echo Starting After Deploy
+ - cd
+ - set
+ - echo attempting exe call
+ - MonoSuave.Deploy.exe

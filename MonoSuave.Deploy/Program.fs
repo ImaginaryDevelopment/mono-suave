@@ -88,4 +88,6 @@ let main argv =
     printfn "MonoSuave.Deploy running"
     printfn "%A" argv
     appveyorRest()
+    |> ignore
+    0
     //0 // return an integer exit code
