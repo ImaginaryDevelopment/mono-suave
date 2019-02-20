@@ -37,7 +37,7 @@ deploy:
       branch: master                # release from master branch only
 
   - provider: FTP
-    protocol: ftps
+    protocol: ftp|ftps|sftp
     host:
       secure: Zq6zUVt7fzsNVFgg/F+AmzthFqT8DMJTa/Fv3uMiEqxTQEQtHwD801BSRwEj3z0O
     username:
