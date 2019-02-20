@@ -63,7 +63,7 @@ let appveyorRest() =
         locateZip()
         |> function
             |Some x -> Some x
-            | None -> ZipItManually()
+            | None -> zipItManually()
         |> Option.map(fun zp ->
             async{
                 let bytes = File.ReadAllBytes(zp)
