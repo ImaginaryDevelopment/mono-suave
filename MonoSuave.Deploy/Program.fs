@@ -7,7 +7,7 @@ open System.Text
 // Learn more about F# at http://fsharp.org
 // See the 'F# Tutorial' project for more help.
 let rec search basePath =
-    printfn "Starting search"
+    printfn "Starting in search %s" basePath
     seq{
         yield! Directory.EnumerateFiles(basePath,"*.zip")
         yield! (
@@ -33,7 +33,7 @@ let locateZip () =
         eprintfn "zip not found at %s" fullPath
         None
     else
-        let zipFilePath = Path.Combine(zipPath,zipFilename)
+        let zipFilePath = Path.Combine(zipPath,@"MonoSuave\bin",zipFilename)
         if not <| File.Exists zipFilePath then
             printfn "File not found at %s" zipFilePath
             eprintfn "File not found at %s" zipFilePath
