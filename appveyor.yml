@@ -27,7 +27,6 @@ artifacts:
 before_deploy:
  - echo Starting Before Deploy
  - cd
- - set
  - echo $configuration
  - echo checking ls
  - ls MonoSuave.Deploy/bin
@@ -66,4 +65,3 @@ deploy:
 after_deploy:
  - echo Starting After Deploy
  - cd
- - set

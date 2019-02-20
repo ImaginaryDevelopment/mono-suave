@@ -7,6 +7,22 @@ open System.IO.Compression
 
 let expand x = Environment.ExpandEnvironmentVariables x
 let baseBuildPath = expand "%APPVEYOR_BUILD_FOLDER%" 
+let prettifySize (i:int64) =
+    let sizes = ["B";"KB";"MB";"GB";"TB"]
+    
+    (i,0) |> Seq.unfold(fun (l,order) ->
+        if l < 1024L && order = 0 then
+            let result =(l,sizes.[0])
+            Some(result,(0L,sizes.Length))
+        elif l >= 1024L && order < sizes.Length then
+            let result =(l,sizes.[order])
+            Some (result,(i/1024L,order + 1))
+        else None
+    )
+    |> Seq.tryLast
+    |> function
+        |None -> sprintf "%A%s" i sizes.[0]
+        |Some(rem,o) -> sprintf "%A%s" rem sizes.[o]
 
 let rec search basePath =
     printfn "Starting in search %s" basePath
@@ -25,6 +41,10 @@ let zipItManually() =
     let binaryPath = Path.Combine(baseBuildPath,@"MonoSuave\bin\Release")
     let target = Path.Combine(baseBuildPath,"Zipped.zip")
     ZipFile.CreateFromDirectory(binaryPath,target)
+    FileInfo(target).Length
+    |> prettifySize
+    |> printfn "Created zip with size %A" 
+
     Some target
 let locateZip () =
 
@@ -34,13 +54,11 @@ let locateZip () =
     if not <| Directory.Exists zipPath then
         let fullPath = Path.GetFullPath zipPath
         // maybe eprintfn doesn't show up
-        printfn "zip not found at %s" fullPath
         eprintfn "zip not found at %s" fullPath
         None
     else
         let zipFilePath = Path.Combine(zipPath,@"MonoSuave\bin",zipFilename)
         if not <| File.Exists zipFilePath then
-            printfn "File not found at %s" zipFilePath
             eprintfn "File not found at %s" zipFilePath
             search zipPath
             |> Seq.tryFind(fun zip ->
