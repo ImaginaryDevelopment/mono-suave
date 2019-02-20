@@ -12,6 +12,9 @@ assembly_info:
   assembly_file_version: "{version}"
   assembly_informational_version: "{version}"
 
+# build Configuration, i.e. Debug, Release, etc.
+configuration: Release
+
 
 after_build:
  - cd
