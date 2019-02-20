@@ -20,10 +20,10 @@ after_build:
  - cd
  - set
  - echo $configuration
- - ls MonoSuave/MonoSuave/bin
+ - ls MonoSuave/bin
 
 artifacts:
- - path: MonoSuave/MonoSuave/bin/$(configuration)
+ - path: MonoSuave/bin/$(configuration)
 
 deploy:
   # Deploy to GitHub Releases
