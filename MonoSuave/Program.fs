@@ -88,21 +88,38 @@ let main argv =
             use cts = new System.Threading.CancellationTokenSource()
 
             let config = {defaultConfig with bindings=add::defaultConfig.bindings;cancellationToken=cts.Token}
-            let t = Updater.Serving.createWatcher cd |> Async.map (fun fn -> ServerCloseType.ForUpdate(fn,cd)) |> Async.StartAsTask
-            let _,stopped = startWebServerAsync config (cd |> Serving.routing)
-            let watch,t =
-                Async.AwaitTask t,
-                stopped |> Async.map (fun _ -> ServerCloseType.Terminated)
-            [ watch;t ]
-            |> Async.Choice
+            let startServing():Async<ServerCloseType>=
+                let _,startMe = startWebServerAsync config (cd |> Serving.routing)
+                let asyncTask =
+                    startMe
+                    // https://github.com/SuaveIO/suave/issues/454
+                    // apparently the server doesn't start listening until this Async is started
+                    |> Async.StartAsTask
+                    |> Async.AwaitTask
+                asyncTask
+                |> Async.map (fun () -> ServerCloseType.Terminated)
+
+            let runWithWatcher() =
+                let t = Updater.Serving.createWatcher cd |> Async.map (fun fn -> ServerCloseType.ForUpdate(fn,cd)) |> Async.StartAsTask
+                let stopped = startServing()
+                let watch,t =
+                    Async.AwaitTask t,
+                    stopped |> Async.map (fun _ -> ServerCloseType.Terminated)
+                [ watch;t ]
+                |> Async.Choice
+            startServing()
+            |> Async.Catch
             |> Async.RunSynchronously
             |> function
-                |ServerCloseType.Terminated ->
+                |Choice1Of2 ServerCloseType.Terminated ->
                     logBroadcast "Terminated"
-                |ServerCloseType.ForUpdate (fn,targetPath) ->
+                |Choice1Of2 (ServerCloseType.ForUpdate (fn,targetPath)) ->
                     logBroadcast "ForUpdate"
                     Updater.Serving.launch {AppFileSystemDirectoryPath=targetPath;UpdateFilePath=fn}
                     ()
+                |Choice2Of2 ex ->
+                    logBroadcast ex.Message
+                    logBroadcast ex.StackTrace
 
 
             eprintfn "Server finished?"
