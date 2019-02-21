@@ -97,8 +97,10 @@ let main argv =
             |> Async.Choice
             |> Async.RunSynchronously
             |> function
-                |ServerCloseType.Terminated -> ()
+                |ServerCloseType.Terminated ->
+                    logBroadcast "Terminated"
                 |ServerCloseType.ForUpdate (fn,targetPath) ->
+                    logBroadcast "ForUpdate"
                     Updater.Serving.launch {AppFileSystemDirectoryPath=targetPath;UpdateFilePath=fn}
                     ()
 

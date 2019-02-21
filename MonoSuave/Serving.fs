@@ -16,11 +16,19 @@ module Impl =
             logBroadcast message
             never ctx
 open Impl
+open System.Threading.Tasks
 
 let routing rootPath =
     choose [
         diagnosticPart
         // force deferral of method run, instead of closing over the result at the time of routing init
-        path "/logs" >=> (fun ctx -> EnvironmentHelpers.getLogs rootPath |> Json.toJson |> ok |> fun f -> f ctx)
+        path "/logs" >=> (fun ctx ->
+                async{
+                    let t = Task.Run(System.Func<_>(fun () ->  EnvironmentHelpers.getLogs rootPath |> Json.toJson |> ok |> fun f -> f ctx))
+                    let! value = Async.AwaitTask(t)
+                    return! value
+                }
+        )
+
         path "/" >=> OK "hello"
     ]
