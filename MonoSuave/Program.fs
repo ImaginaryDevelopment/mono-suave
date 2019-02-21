@@ -1,59 +1,75 @@
-﻿open Suave
+﻿open System
+open System.Net
+
+open Suave
 open Suave.Filters
 open Suave.Operators
 open Suave.Successful
-open System.Net
 
-let (|ParseInt|_|)=
-    function
-    | null | "" -> None
-    | x ->
-        match System.Int32.TryParse x with
-        | true, x -> Some x
-        | _ -> None
-        
-// Learn more about F# at http://fsharp.org
-// See the 'F# Tutorial' project for more help.
-let broadcast msg =
-    System.Diagnostics.Trace.WriteLine <| sprintf "trace:%s" msg
-    printfn "out:%s" msg
-    eprintfn "e:%s" msg
-    System.Diagnostics.Debug.WriteLine <| sprintf "debug:%s" msg
-let logBroadcast msg =
-    broadcast msg
-    try
-        System.IO.File.AppendAllLines("MonoSuave.log",[msg])
-    with ex ->
-        broadcast ex.Message
-let routing =
-    // print the incoming raw query, and don't match
-    let diagnosticPart :WebPart =
-        fun ctx ->
-            let message = sprintf "Routing a request %s" ctx.request.rawQuery
-            broadcast message
-            never ctx
-    choose[
-        diagnosticPart
-        path "/" >=> OK "hello"
-    ]
+open Helpers
+open Schema
+
+type ServerCloseType =
+    | ForUpdate of updateFilename:string*targetDirectory:string
+    | Terminated
+[<RequireQualifiedAccess>]
+type RunMode =
+    |Suave of Sockets.Port
+    |Update of updateFilename:string*targetDirectory:string
+    |Watch of targetDirectory:string
+
 [<EntryPoint>]
 let main argv =
     printfn "args:%A" argv
+    let cd = Environment.CurrentDirectory
+    printfn "Cd:%s" cd
     match argv |> List.ofArray with
-    | ParseInt port :: _ -> uint16 port |> Choice1Of2
-    | "update" :: filename :: runPath :: [] ->  Choice2Of2 (filename,runPath)
-    | "update" :: _ -> failwithf "bad update args"
-    | _ -> HttpBinding.defaults.socketBinding.port |> Choice1Of2
+    | ParseInt port :: _ -> uint16 port |> RunMode.Suave
+    | "update" :: filename :: runPath :: [] ->  RunMode.Update(filename,runPath)
+    | "update" :: _ -> //failwithf "bad update args"
+        let basePath = @"D:\home\site\wwwroot"
+        let updateLanding = IO.Path.Combine(basePath,"MonoSuave","bin","Release.zip")
+        RunMode.Update(updateLanding,basePath)
+    | "watch" :: path :: [] ->
+        RunMode.Watch path
+    | "watch" :: [] ->
+        cd
+        |> RunMode.Watch
+    | _ -> RunMode.Suave HttpBinding.defaults.socketBinding.port
     //| _ -> 8080us
     |> function
-        |Choice2Of2 (filename,runPath) -> Updater.updateMe filename runPath
-        | Choice1Of2 port ->
+        | RunMode.Update(updateFilename,targetDirectory) -> Updater.Updating.updateMe {AppFileSystemDirectoryPath=targetDirectory;UpdateFilePath=updateFilename }
+        // only exists for testing/debugging
+        | RunMode.Watch path ->
+            async{
+                let! tp = Updater.Serving.createWatcher path
+                return tp
+            }
+            |> Async.RunSynchronously
+            |> fun x ->
+                broadcast <| sprintf "time to update %s" x
+        | RunMode.Suave port ->
             printfn "Starting up server"
             printfn "Binding also to port %A" port
             let add = HttpBinding.create HTTP (IPAddress.Parse "0.0.0.0") port
+            use cts = new System.Threading.CancellationTokenSource()
 
-            let config = {defaultConfig with bindings=add::defaultConfig.bindings}
-            let t = Updater.launchWatcher()
-            startWebServer config routing
+            let config = {defaultConfig with bindings=add::defaultConfig.bindings;cancellationToken=cts.Token}
+            let t = Updater.Serving.createWatcher cd |> Async.map (fun fn -> ServerCloseType.ForUpdate(fn,cd)) |> Async.StartAsTask
+            let _,stopped = startWebServerAsync config (cd |> Serving.routing)
+            let watch,t =
+                Async.AwaitTask t,
+                stopped |> Async.map (fun _ -> ServerCloseType.Terminated)
+            [ watch;t ]
+            |> Async.Choice
+            |> Async.RunSynchronously
+            |> function
+                |ServerCloseType.Terminated ->
+                    ()
+                |ServerCloseType.ForUpdate (fn,targetPath) ->
+                    Updater.Serving.launch {AppFileSystemDirectoryPath=targetPath;UpdateFilePath=fn}
+                    ()
+
+
             eprintfn "Server finished?"
     0 // return an integer exit code

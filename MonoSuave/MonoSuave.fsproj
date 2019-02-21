@@ -25,6 +25,7 @@
     <PlatformTarget>AnyCPU</PlatformTarget>
     <DocumentationFile>bin\$(Configuration)\$(AssemblyName).XML</DocumentationFile>
     <Prefer32Bit>true</Prefer32Bit>
+    <StartArguments>watch</StartArguments>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <DebugType>pdbonly</DebugType>
@@ -46,6 +47,9 @@
   <Import Project="$(FSharpTargetsPath)" />
   <ItemGroup>
     <Compile Include="AssemblyInfo.fs" />
+    <Compile Include="SharingIsCaring.fs" />
+    <Compile Include="Schema.fs" />
+    <Compile Include="Serving.fs" />
     <Compile Include="Updater.fs" />
     <Compile Include="Program.fs" />
     <None Include="App.config" />
@@ -54,6 +58,7 @@
     <Content Include="web.config">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
+    <EmbeddedResource Include="MonoSuaveResources.resx" />
   </ItemGroup>
   <ItemGroup>
     <Reference Include="FSharp.Core">
