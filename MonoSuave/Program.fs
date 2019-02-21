@@ -50,6 +50,7 @@ let main argv =
             IO.File.ReadAllText fn
             |> printfn "%s"
         | RunMode.Type _ ->
+            printfn "Trying to print all logs"
             EnvironmentHelpers.getLogs cd
             |> Seq.iter(fun (dt,text) ->
                 printfn ""

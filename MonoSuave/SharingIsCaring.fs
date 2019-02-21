@@ -29,7 +29,13 @@ let broadcast msg =
     System.Diagnostics.Debug.WriteLine <| sprintf "debug:%s" msg
 let tryLog msg =
     try
-        System.IO.File.AppendAllLines("MonoSuave.log",[msg])
+        let target =
+            let fn ="MonoSuave.log"
+            let dn = "_diag"
+            if IO.Directory.Exists dn  then
+                IO.Path.Combine(dn,fn)
+            else fn
+        System.IO.File.AppendAllLines(target,[msg])
     with ex ->
         broadcast ex.Message
 let logBroadcast msg =
