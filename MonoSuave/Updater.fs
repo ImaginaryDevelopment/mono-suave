@@ -23,15 +23,16 @@ module Impl =
         // https://stackoverflow.com/questions/179556/will-app-offline-htm-stop-current-requests-or-just-new-requests
         // but the context this method will run under, won't be in the web app's app domain, it will have spawned another process, that should work right?
         try
-            broadcast "writing app_offline.htm"
+            logBroadcast "writing app_offline.htm"
             let asm = Assembly.GetExecutingAssembly()
             let rm = ResourceManager("MonoSuave.MonoSuaveResources",asm)
             let html = rm.GetString("App_Offline.htm")
             let targetFullPath=Path.Combine(rootPath,"app_offline.htm")
-            broadcast <| sprintf "writing offline to %s" targetFullPath
+            logBroadcast <| sprintf "writing offline to %s" targetFullPath
             File.WriteAllText(targetFullPath,html)
         with ex ->
-            broadcast <| sprintf "appOfflineFailed %s" ex.Message
+            logBroadcast <| sprintf "appOfflineFailed %s" ex.Message
+
     let cleanFilesFiltered path fInclude =
         // swallow trying to clean out the old files
         try
@@ -44,7 +45,7 @@ module Impl =
                     eprintfn "Failed to delete from target directory '%s':%s" x ex.Message
             )
         with ex ->
-            eprintfn "Failed to clear target directory:%s" ex.Message
+            logBroadcast <| sprintf "Failed to clear target directory:%s" ex.Message
             ()
 
     let cleanFiles path =
@@ -64,14 +65,15 @@ module Serving =
                 fn.EndsWith(".zip", StringComparison.InvariantCultureIgnoreCase)
                 |> not
             )
-        printfn "going to watch %s" updatePath
+        logBroadcast <| sprintf "going to watch %s" updatePath
         async{
             // dispose of the watcher as soon as the first event fires, we don't want our extraction to incur more events
             let! args =
                 // https://msdn.microsoft.com/en-us/visualfsharpdocs/conceptual/async.awaitevent%5B%27del,%27t%5D-method-%5Bfsharp%5D?f=255&MSPPError=-2147217396
                 use watch = new FileSystemWatcher(updatePath,NotifyFilter=NotifyFilters.LastWrite)
                 watch.EnableRaisingEvents <- true
-                watch.Changed.Add <| fun _ -> printfn "The file %s is changed" updatePath
+                watch.Changed.Add <| fun _ ->
+                    logBroadcast <| sprintf "The file %s is changed" updatePath
                 Async.AwaitEvent watch.Changed
             // we don't know if the event is triggered when the file starts writing, or when it finishes
             do! Async.Sleep 2000
@@ -82,9 +84,9 @@ module Serving =
     let launch {AppFileSystemDirectoryPath=rootPath;UpdateFilePath=fn} =
         let cmd = "MonoSuave.exe"
         let args = sprintf "update \"%s\" \"%s\"" fn rootPath
-        broadcast <| sprintf "Starting update '%s %s'" cmd args
+        logBroadcast <| sprintf "Starting update '%s %s'" cmd args
         Process.Start(cmd,args) |> ignore
-        broadcast "Process Started"
+        logBroadcast "Process Started"
 
 
 module Updating =
@@ -122,6 +124,7 @@ module Updating =
 
         // unzip to run
         System.IO.Compression.ZipFile.ExtractToDirectory(updateFilePath,runDirectoryPath)
+        logBroadcast <| sprintf "done extracting to %s" runDirectoryPath
         // next request should auto-launch the new updated app thanks to w3wp, yes?
         ()
 

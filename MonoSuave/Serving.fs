@@ -24,7 +24,7 @@ let routing rootPath =
         // force deferral of method run, instead of closing over the result at the time of routing init
         path "/logs" >=> (fun ctx ->
                 async{
-                    let t = Task.Run(System.Func<_>(fun () ->  EnvironmentHelpers.getLogs rootPath |> Json.toJson |> ok |> fun f -> f ctx))
+                    let t = Task.Run(System.Func<_>(fun () -> EnvironmentHelpers.getLogs rootPath |> Json.toJson |> ok |> fun f -> f ctx))
                     let! value = Async.AwaitTask(t)
                     return! value
                 }
