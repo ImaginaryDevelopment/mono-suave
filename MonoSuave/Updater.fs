@@ -26,7 +26,7 @@ module Impl =
             broadcast "writing app_offline.htm"
             let asm = Assembly.GetExecutingAssembly()
             let rm = ResourceManager("MonoSuave.MonoSuaveResources",asm)
-            let html = rm.GetString("AppOffline.htm")
+            let html = rm.GetString("App_Offline.htm")
             let targetFullPath=Path.Combine(rootPath,"app_offline.htm")
             broadcast <| sprintf "writing offline to %s" targetFullPath
             File.WriteAllText(targetFullPath,html)

@@ -13,7 +13,7 @@ module Impl =
     let diagnosticPart :WebPart =
         fun ctx ->
             let message = sprintf "Routing a request %s" ctx.request.rawQuery
-            broadcast message
+            logBroadcast message
             never ctx
 open Impl
 
