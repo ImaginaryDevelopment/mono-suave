@@ -15,17 +15,20 @@ let (|ParseInt|_|)=
         | _ -> None
 
 let inline close1 f x = fun () -> f x
+
 let broadcast msg =
     System.Diagnostics.Trace.WriteLine <| sprintf "trace:%s" msg
     printfn "out:%s" msg
     eprintfn "e:%s" msg
     System.Diagnostics.Debug.WriteLine <| sprintf "debug:%s" msg
-let logBroadcast msg =
-    broadcast msg
+let tryLog msg =
     try
         System.IO.File.AppendAllLines("MonoSuave.log",[msg])
     with ex ->
         broadcast ex.Message
+let logBroadcast msg =
+    broadcast msg
+    tryLog msg
 
 module Seq =
     let mapSwallow fUnhappy f =

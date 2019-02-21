@@ -17,6 +17,7 @@ type RunMode =
     |Suave of Sockets.Port
     |Update of updateFilename:string*targetDirectory:string
     |Watch of targetDirectory:string
+    |Fetch of uri:string
 
 [<EntryPoint>]
 let main argv =
@@ -32,6 +33,8 @@ let main argv =
         RunMode.Update(updateLanding,basePath)
     | "watch" :: path :: [] ->
         RunMode.Watch path
+    | "fetch" :: path :: [] ->
+        RunMode.Fetch path
     | "watch" :: [] ->
         cd
         |> RunMode.Watch
@@ -39,6 +42,15 @@ let main argv =
     //| _ -> 8080us
     |> function
         | RunMode.Update(updateFilename,targetDirectory) -> Updater.Updating.updateMe {AppFileSystemDirectoryPath=targetDirectory;UpdateFilePath=updateFilename }
+        | RunMode.Fetch path ->
+            let path = path.Trim('"').Trim('\'')
+            async {
+                use wc = new System.Net.Http.HttpClient()
+                let! result = wc.GetStringAsync(path)
+                return result
+            }
+            |> Async.RunSynchronously
+            |> printfn "FetchResults:\r\n%s"
         // only exists for testing/debugging
         | RunMode.Watch path ->
             async{
@@ -51,6 +63,7 @@ let main argv =
         | RunMode.Suave port ->
             printfn "Starting up server"
             printfn "Binding also to port %A" port
+            tryLog <| sprintf "Started on port:%i" port
             let add = HttpBinding.create HTTP (IPAddress.Parse "0.0.0.0") port
             use cts = new System.Threading.CancellationTokenSource()
 
@@ -64,8 +77,7 @@ let main argv =
             |> Async.Choice
             |> Async.RunSynchronously
             |> function
-                |ServerCloseType.Terminated ->
-                    ()
+                |ServerCloseType.Terminated -> ()
                 |ServerCloseType.ForUpdate (fn,targetPath) ->
                     Updater.Serving.launch {AppFileSystemDirectoryPath=targetPath;UpdateFilePath=fn}
                     ()
