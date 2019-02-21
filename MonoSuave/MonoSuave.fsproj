@@ -49,6 +49,7 @@
     <Compile Include="AssemblyInfo.fs" />
     <Compile Include="SharingIsCaring.fs" />
     <Compile Include="Schema.fs" />
+    <Compile Include="EnvironmentHelpers.fs" />
     <Compile Include="Serving.fs" />
     <Compile Include="Updater.fs" />
     <Compile Include="Program.fs" />

@@ -18,6 +18,7 @@ type RunMode =
     |Update of updateFilename:string*targetDirectory:string
     |Watch of targetDirectory:string
     |Fetch of uri:string
+    |Type of fnOpt:string
 
 [<EntryPoint>]
 let main argv =
@@ -26,6 +27,10 @@ let main argv =
     printfn "Cd:%s" cd
     match argv |> List.ofArray with
     | ParseInt port :: _ -> uint16 port |> RunMode.Suave
+    | "Type" :: x :: [] ->
+        RunMode.Type x
+    | "Type" :: [] ->
+        RunMode.Type null
     | "update" :: filename :: runPath :: [] ->  RunMode.Update(filename,runPath)
     | "update" :: _ -> //failwithf "bad update args"
         let basePath = @"D:\home\site\wwwroot"
@@ -41,6 +46,20 @@ let main argv =
     | _ -> RunMode.Suave HttpBinding.defaults.socketBinding.port
     //| _ -> 8080us
     |> function
+        | RunMode.Type (ValueString fn) ->
+            IO.File.ReadAllText fn
+            |> printfn "%s"
+        | RunMode.Type _ ->
+            EnvironmentHelpers.getLogs cd
+            |> Seq.iter(fun (dt,text) ->
+                printfn ""
+                printfn "LogDt:%A" dt
+                printfn ""
+                printfn "----------------------"
+                printfn "%s" text
+                printfn "----------------------"
+            )
+
         | RunMode.Update(updateFilename,targetDirectory) -> Updater.Updating.updateMe {AppFileSystemDirectoryPath=targetDirectory;UpdateFilePath=updateFilename }
         | RunMode.Fetch path ->
             let path = path.Trim('"').Trim('\'')

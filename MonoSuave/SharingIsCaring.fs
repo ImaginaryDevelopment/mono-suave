@@ -2,6 +2,12 @@
 open System
 open System.Threading
 
+let (|ValueString|NonValueString|) =
+    function
+    | "" | null -> NonValueString
+    | x when String.IsNullOrWhiteSpace x -> NonValueString
+    | x -> ValueString x
+
 let inline endsWithI d =
     function
     | "" | null -> false
